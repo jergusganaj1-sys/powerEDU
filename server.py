@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Stav servera (jednoduchá simulácia pre powerEDU)
+# Stav servera
 server_state = {
     "status": "online",
     "active_clients": 0,
@@ -21,14 +21,17 @@ def home():
 def get_status():
     return jsonify(server_state)
 
+@app.route("/boot", methods=["POST"])
+def boot_up():
+    server_state["status"] = "online"
+    return jsonify({"message": "🚀 Server úspešne naštartovaný (Boot Up)!"}), 200
+
 @app.route("/shutdown", methods=["POST"])
 def master_shutdown():
-    # Token alebo kľúč môžeš doplniť neskôr, zatiaľ reaguje priamo
     server_state["status"] = "offline"
     server_state["active_clients"] = 0
     return jsonify({"message": "⚡ MASTER SHUTDOWN úspešne vykonaný!"}), 200
 
 if __name__ == "__main__":
-    # Render automaticky pridelí port cez premennú prostredia PORT, inak predvolený 10000
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
